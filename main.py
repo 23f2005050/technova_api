@@ -88,12 +88,10 @@ def execute(q: str = ""):
     if issue_match:
         issue_code = int(issue_match.group(1))
         department = issue_match.group(2)
-
         return JSONResponse(
             content={
-                "name":"report_office_issue",
-                "arguments": f'{{"issue_code":{issue_code},"department":"{department}"}}'
+                "name":"unknown_function",
+                "arguments":"{}"
             }
         )
-
     return JSONResponse(content={"error":"Query not recognized"})
