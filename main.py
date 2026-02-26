@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import re
 
 app = FastAPI()
@@ -14,7 +15,7 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message": "TechNova API is running"}
+    return JSONResponse(content={"message":"TechNova API is running"})
 
 @app.get("/execute")
 def execute(q: str):
@@ -23,10 +24,13 @@ def execute(q: str):
     ticket_match = re.search(r"ticket (\d+)", q, re.IGNORECASE)
     if ticket_match:
         ticket_id = int(ticket_match.group(1))
-        return {
-            "name": "get_ticket_status",
-            "arguments": f'{{"ticket_id": {ticket_id}}}'
-        }
+
+        return JSONResponse(
+            content={
+                "name":"get_ticket_status",
+                "arguments": f'{{"ticket_id":{ticket_id}}}'
+            }
+        )
 
     # 🎯 2. Schedule Meeting
     meeting_match = re.search(
@@ -39,20 +43,24 @@ def execute(q: str):
         time = meeting_match.group(2)
         room = meeting_match.group(3)
 
-        return {
-            "name": "schedule_meeting",
-            "arguments": f'{{"date": "{date}", "time": "{time}", "meeting_room": "{room}"}}'
-        }
+        return JSONResponse(
+            content={
+                "name":"schedule_meeting",
+                "arguments": f'{{"date":"{date}","time":"{time}","meeting_room":"{room}"}}'
+            }
+        )
 
     # 🎯 3. Expense Balance
     expense_match = re.search(r"employee (\d+)", q, re.IGNORECASE)
     if "expense" in q.lower() and expense_match:
         employee_id = int(expense_match.group(1))
 
-        return {
-            "name": "get_expense_balance",
-            "arguments": f'{{"employee_id": {employee_id}}}'
-        }
+        return JSONResponse(
+            content={
+                "name":"get_expense_balance",
+                "arguments": f'{{"employee_id":{employee_id}}}'
+            }
+        )
 
     # 🎯 4. Performance Bonus
     bonus_match = re.search(r"employee (\d+) for (\d{4})", q, re.IGNORECASE)
@@ -60,10 +68,12 @@ def execute(q: str):
         employee_id = int(bonus_match.group(1))
         year = int(bonus_match.group(2))
 
-        return {
-            "name": "calculate_performance_bonus",
-            "arguments": f'{{"employee_id": {employee_id}, "current_year": {year}}}'
-        }
+        return JSONResponse(
+            content={
+                "name":"calculate_performance_bonus",
+                "arguments": f'{{"employee_id":{employee_id},"current_year":{year}}}'
+            }
+        )
 
     # 🎯 5. Office Issue
     issue_match = re.search(
@@ -75,9 +85,11 @@ def execute(q: str):
         issue_code = int(issue_match.group(1))
         department = issue_match.group(2)
 
-        return {
-            "name": "report_office_issue",
-            "arguments": f'{{"issue_code": {issue_code}, "department": "{department}"}}'
-        }
+        return JSONResponse(
+            content={
+                "name":"report_office_issue",
+                "arguments": f'{{"issue_code":{issue_code},"department":"{department}"}}'
+            }
+        )
 
-    return {"error": "Query not recognized"}
+    return JSONResponse(content={"error":"Query not recognized"})
